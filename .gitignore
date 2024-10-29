@@ -18,3 +18,8 @@
 
 # build/ generated from 'pip install -e .' in developer mode
 build/
+/src/mflux/dreambooth/loss_derivation/dreambooth_loss.synctex.gz
+/src/mflux/dreambooth/loss_derivation/dreambooth_loss.fdb_latexmk
+/src/mflux/dreambooth/loss_derivation/dreambooth_loss.fls
+/src/mflux/dreambooth/loss_derivation/dreambooth_loss.aux
+/src/mflux/dreambooth/loss_derivation/dreambooth_loss.log
