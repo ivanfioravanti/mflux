@@ -11,6 +11,7 @@ from mflux.dreambooth.dreambooth_preprocessing import DreamBoothPreProcessing
 from mflux.dreambooth.finetuning_batch_example import Example
 from mflux.dreambooth.finetuning_dataset_iterator import DatasetIterator
 from mflux.post_processing.array_util import ArrayUtil
+from mflux.ui.defaults import TRAIN_HEIGHT, TRAIN_WIDTH
 
 
 class FineTuningDataset:
@@ -76,7 +77,7 @@ class FineTuningDataset:
     @staticmethod
     def _encode_image(vae: nn.Module, image_path: Path) -> mx.array:
         image = PIL.Image.open(image_path)
-        scaled_user_image = ImageUtil.scale_to_dimensions(image, target_width=1024, target_height=1024)
+        scaled_user_image = ImageUtil.scale_to_dimensions(image, target_width=TRAIN_WIDTH, target_height=TRAIN_HEIGHT)
         encoded = vae.encode(ImageUtil.to_array(scaled_user_image))
-        latents = ArrayUtil.pack_latents(encoded, width=1024, height=1024)
+        latents = ArrayUtil.pack_latents(encoded, width=TRAIN_WIDTH, height=TRAIN_HEIGHT)
         return latents

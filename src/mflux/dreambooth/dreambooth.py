@@ -7,6 +7,7 @@ from mflux.dreambooth.dreambooth_loss import DreamBoothLoss
 from mflux.dreambooth.dreambooth_util import DreamBoothUtil
 from mflux.dreambooth.finetuning_dataset import FineTuningDataset
 from mflux.dreambooth.optimizer import Optimizer
+from mflux.ui.defaults import TRAIN_HEIGHT, TRAIN_WIDTH
 
 
 def main():
@@ -15,12 +16,12 @@ def main():
         model_config=ModelConfig.FLUX1_DEV,
         config=Config(
             num_inference_steps=20,
-            width=1024,
-            height=1024,
+            width=TRAIN_WIDTH,
+            height=TRAIN_HEIGHT,
             guidance=4.0,
         ),
     )
-    flux = Flux1(model_config=runtime_config.model_config, quantize=8)
+    flux = Flux1(model_config=runtime_config.model_config, quantize=4)
     flux.freeze()
     flux.set_lora_layer()
 
@@ -38,9 +39,9 @@ def main():
     )  # fmt: off
 
     # Training loop
-    num_epochs = 20
+    num_epochs = 50
     steps_per_epoch = 100
-    batch_size = 3
+    batch_size = 1
     global_step = 0
     for epoch in range(num_epochs):
         dataset_iterator = dataset.get_iterator(batch_size)
@@ -55,7 +56,7 @@ def main():
 
                 # Progress tracking and saving
                 global_step += 1
-                DreamBoothUtil.save_incrementally(flux, global_step)
+                DreamBoothUtil.save_incrementally_and_generate_image(flux, global_step)
 
                 # Update the progress bar
                 pbar.set_postfix({"loss": loss.item()})
