@@ -7,7 +7,7 @@ from mlx import nn
 class LoRALinear(nn.Module):
     @staticmethod
     def from_linear(
-        linear: nn.Linear,
+        linear: nn.Linear | nn.QuantizedLinear,
         r: int = 16,
         scale: float = 1.0,
     ):
@@ -28,7 +28,6 @@ class LoRALinear(nn.Module):
         input_dims: int,
         output_dims: int,
         r: int = 8,
-        dropout: float = 0.0,
         scale: float = 1.0,
         bias: bool = False,
     ):
@@ -36,16 +35,19 @@ class LoRALinear(nn.Module):
         self.linear = nn.Linear(input_dims, output_dims, bias=bias)
         self.scale = scale
         scale = 1 / math.sqrt(input_dims)
+
         self.lora_a = mx.random.uniform(
             low=-scale,
             high=scale,
             shape=(input_dims, r),
         )
         self.lora_b = mx.random.uniform(
+            low=-scale,
+            high=scale,
             shape=(r, output_dims),
-        )  # fmt: off
+        )
 
     def __call__(self, x):
-        adapter = self.scale * mx.matmul(self.lora_a, self.lora_b)
-        adapter = adapter[None].astype(x.dtype)
-        return self.linear(x) + mx.matmul(x, adapter)
+        base_out = self.linear(x)
+        lora_out = mx.matmul(mx.matmul(x, self.lora_a), self.lora_b)
+        return base_out + self.scale * lora_out
