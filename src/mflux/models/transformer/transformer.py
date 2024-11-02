@@ -66,7 +66,7 @@ class Transformer(nn.Module):
         hidden_states = mx.concatenate([encoder_hidden_states, hidden_states], axis=1)
 
         for idx, block in enumerate(self.single_transformer_blocks):
-            hidden_states = block.forward(
+            hidden_states = block(
                 hidden_states=hidden_states,
                 text_embeddings=text_embeddings,
                 rotary_embeddings=image_rotary_emb,
