@@ -169,7 +169,10 @@ class Flux1(nn.Module):
         self.clip_text_encoder.freeze()
 
     def set_lora_layer(self) -> None:
-        last_transformer_block = self.transformer.single_transformer_blocks[37]
-        previous_linear = last_transformer_block.proj_out
-        lora_linear = LoRALinear.from_linear(linear=previous_linear)
-        last_transformer_block.proj_out = lora_linear
+        for i in range(0, 38):
+            block = self.transformer.single_transformer_blocks[i]
+            block.proj_out = LoRALinear.from_linear(linear=block.proj_out)
+            block.proj_mlp = LoRALinear.from_linear(linear=block.proj_mlp)
+            block.attn.to_q = LoRALinear.from_linear(linear=block.attn.to_q)
+            block.attn.to_k = LoRALinear.from_linear(linear=block.attn.to_k)
+            block.attn.to_v = LoRALinear.from_linear(linear=block.attn.to_v)
